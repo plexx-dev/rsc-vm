@@ -1,0 +1,33 @@
+#Array::
+#u32 size of the array
+#array data
+#Syntax [ type ]
+
+#String::
+# [ u8 ]
+
+#Pair::
+#data 1
+#data 2
+#Syntax { type 1, type 2 }
+
+u32 magic word
+
+u32 version number
+
+u8 number of memory locations
+
+#I/O section
+u32 number of input identifiers
+[ { String, u8 } input identifiers ]
+u32 number of output identifiers
+[ { String, u8 } output identifiers ]
+
+#Immediate section
+u32 number of immediate values
+[ { f64, u8 } immediate value data ]
+
+#Text section
+u32 number of instrucions
+[ u32 instrucion data ]
+u8 opcode, u8 data1, u8 data2, u8 must be 0

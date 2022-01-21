@@ -1,3 +1,8 @@
+extern crate byte;
+
+use byte::*;
+use byte::ctx::*;
+
 struct InputIdentifer {
     identifier: String,
     mem_loc: u8
@@ -13,10 +18,14 @@ struct Immediate {
     mem_loc: u8
 }
 
-pub struct BaseData {
+pub struct Header {
     magic_word: u32,
     version: u32,
     mem_len: u8,
+}
+
+pub struct Data {
+    header: Header,
 
     num_input_identifier: u32,
     input_identifier: Vec<InputIdentifer>,
@@ -31,8 +40,12 @@ pub struct BaseData {
     instructions: Vec<u32>
 }
 
-impl BaseData {
-    pub fn new(filename: &String) -> BaseData {
-        
+impl Data {
+    pub fn new(filename: &str) -> () {
+        read_file(filename)
     }
+}
+
+fn read_file(filename: &str) -> Data {
+
 }
