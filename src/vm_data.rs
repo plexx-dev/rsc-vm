@@ -74,7 +74,7 @@ fn read_file(file_path: &Path) -> () {
 
     println!("{:?}", header);
 
-    if header.magic_word == MAGIC_WORD {
+    if header.magic_word != MAGIC_WORD {
         println!("[ERROR] Magic Word did not match");
         exit(0x0100); // idk took some random code :)
     }
