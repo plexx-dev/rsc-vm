@@ -1,9 +1,7 @@
-mod VMData;
+use std::path::Path;
 
-pub fn load_initial_data(data: VMData) {
-    load_immediates(None);
-}
+use crate::vm_data::Data;
 
-fn load_immediates(_: _) -> _ {
-
+pub fn run(file_path: &Path) {
+    let data = Data::new(file_path);
 }

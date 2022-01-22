@@ -1,5 +1,8 @@
-mod VMData;
+use std::path::Path;
+
+mod vm;
+mod vm_data;
 
 fn main() {
-    VMData::Data::new("files/script.rsbf");
+    vm::run(Path::new("files/script.rsbf"));
 }

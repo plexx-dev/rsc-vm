@@ -11,7 +11,7 @@
 #data 2
 #Syntax { type 1, type 2 }
 
-u32 magic word
+u32 magic word // 0xF00D4U
 
 u32 version number
 
