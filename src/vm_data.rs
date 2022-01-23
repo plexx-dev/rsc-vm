@@ -1,30 +1,26 @@
-use std::process::exit;
+use std::{fs::File, path::Path, process::exit, io::Read};
+
 #[allow(dead_code)]
 #[allow(unused_variables)]
 #[allow(unused_imports)]
 
-use std::{fs::File, path::Path, error::Error, io::{Read}, convert::TryInto, fmt};
-
-struct InputIdentifer {
+#[derive(Debug)]
+pub struct Identifier {
     identifier: String,
     mem_loc: u8
 }
 
-struct OutputIdentifer {
-    identifier: String,
-    mem_loc: u8
-}
-
-struct Immediate {
+#[derive(Debug)]
+pub struct Immediate {
     val: f64,
     mem_loc: u8
 }
 
-struct Instruction {
+#[derive(Debug)]
+pub struct Instruction {
     opcode: u8,
     data1: u8,
     data2: u8,
-    zero: u8
 }
 
 #[derive(Debug)]
@@ -37,17 +33,13 @@ struct Header {
 pub struct Data {
     header: Header,
 
-    num_input_identifier: u32,
-    input_identifier: Vec<InputIdentifer>,
+    input_identifier: Vec<Identifier>,
 
-    num_output_identifier: u32,
-    output_identifier: Vec<OutputIdentifer>,
+    output_identifier: Vec<Identifier>,
 
-    num_immediates: u32,
     immediates: Vec<Immediate>,
 
-    num_intructions: u32,
-    instructions: Instruction,
+    instructions: Vec<Instruction>,
 }
 
 impl Data {
@@ -56,8 +48,8 @@ impl Data {
     }
 }
 
-const MAGIC_WORD: u32 = 0xF00D4;
-fn read_file(file_path: &Path) -> () {
+//Get the Data from the file and return it as a vec of bytes (u8)
+fn get_data(file_path: &Path) -> Vec<u8> {
     let mut file = match File::open(file_path) {
         Err(e) => panic!("Couldnt open {}: {}", file_path.display(), e),
         Ok(file) => file,
@@ -70,38 +62,148 @@ fn read_file(file_path: &Path) -> () {
         Ok(bytes) => println!("Successfully read {} bytes from {}", bytes, file_path.display()),
     }
 
-    let header = read_header(&rsbf_data);
+    rsbf_data
+}
 
-    println!("{:?}", header);
+const MAGIC_WORD: u32 = 0xF00D4;
+fn read_file(file_path: &Path) -> Data {
+    let rsbf_data = get_data(file_path);
+    let next_pos = 0;
 
+    //Read the Header
+    let (header, next_pos) = read_header(&rsbf_data, next_pos);
+    println!("Checking Magic Word");
+
+    //Check Magic Word to check if the file could be a valid one
     if header.magic_word != MAGIC_WORD {
         println!("[ERROR] Magic Word did not match");
-        exit(0x0100); // idk took some random code :)
+        exit(0x0100); // idk took some random code :) to exit here
     }
+    println!("Magic Word was correct");
 
+    println!("Version: {}\nMemory Size: {}bytes with {} Memory Addresses"
+            , header.version, (header.mem_len as u64*4*8), header.mem_len);
 
+    //Read the I/O Section
+    let (num_input_identifier, next_pos) = read_u32(&rsbf_data, next_pos);
+    let (input_identifier, next_pos) = read_identifier(&rsbf_data, next_pos, num_input_identifier);
+
+    let (num_output_identifier, next_pos) = read_u32(&rsbf_data, next_pos);
+    let (output_identifier, next_pos) = read_identifier(&rsbf_data, next_pos, num_output_identifier);
+
+    //Read the Immediate Section
+    let (num_immediates, next_pos) = read_u32(&rsbf_data, next_pos);
+    let (immediates, next_pos) = read_immediates(&rsbf_data, next_pos, num_immediates);
+
+    //Read the Text Section
+    let (num_instruction, next_pos) = read_u32(&rsbf_data, next_pos);
+    let (instructions, _next_pos) = read_instructions(&rsbf_data, next_pos, num_instruction);
+
+    println!("\n{:?}\n{:?}\n{:?}\n{:?}", input_identifier, output_identifier, immediates, instructions);
+
+    Data {header, input_identifier, output_identifier, immediates, instructions}
 }
 
-fn read_header(buffer: &Vec<u8>) -> Header {
-    let magic_word: u32 = read_u32(&buffer, 0, 3);
-    let version: u32 = read_u32(&buffer, 4, 7);
-    let mem_len: u8 = read_u8(&buffer, 8);
+//Basic Function to read the Header
+fn read_header(buffer: &Vec<u8>, start_pos: usize) -> (Header, usize) {
+    let (magic_word, next_pos) = read_u32(&buffer, start_pos);
+    let (version, next_pos) = read_u32(&buffer, next_pos);
+    let (mem_len, next_pos) = read_u8(&buffer, next_pos);
 
-    Header {magic_word, version, mem_len}
+    (Header {magic_word, version, mem_len}, next_pos)
 }
 
-fn read_u8(buffer: &Vec<u8>, pos: usize) -> u8 {
-    buffer[pos]
+//Basic Function to read a u8 from the buffer
+fn read_u8(buffer: &Vec<u8>, pos: usize) -> (u8, usize) {
+    (buffer[pos], pos + 1)
 }
 
-fn read_u32(buffer: &Vec<u8>, start_pos: usize, end_pos: usize) -> u32 {
+//Basic Function to read a u32 from the buffer
+fn read_u32(buffer: &Vec<u8>, start_pos: usize) -> (u32, usize) {
     let mut tmp_buffer: [u8; 4] = [0; 4];
 
     let mut n = 0;
-    for i in start_pos..=end_pos {
+    for i in start_pos..start_pos+4 {
         tmp_buffer[n] = buffer[i];
         n+=1;
     }
 
-    u32::from_ne_bytes(tmp_buffer)
+    (u32::from_ne_bytes(tmp_buffer), start_pos + 4)
+}
+
+//Basic Function to read a f64 from the buffer
+fn read_f64(buffer: &Vec<u8>, start_pos: usize) -> (f64, usize) {
+    let mut tmp_buffer: [u8; 8] = [0; 8];
+
+    let mut n = 0;
+    for i in start_pos..start_pos+8 {
+        tmp_buffer[n] = buffer[i];
+        n+=1;
+    }
+
+    (f64::from_ne_bytes(tmp_buffer), start_pos + 8)
+}
+
+//Basic Function to read the input Identifier from the Buffer
+fn read_identifier(buffer: &Vec<u8>, start_pos: usize, num: u32) -> (Vec<Identifier>, usize) {
+    let mut next_pos = start_pos;
+    let mut identifier_list: Vec<Identifier> = Vec::with_capacity(num as usize);
+    
+    for _ in 0..num as usize {
+        let (identifier_len, mut _next_pos) = read_u32(buffer, next_pos);
+
+        let mut string_buffer: Vec<u8> = Vec::with_capacity(identifier_len as usize);
+        for __ in 0..identifier_len {
+            let (identifier_char, __next_pos) = read_u8(buffer, _next_pos);
+            string_buffer.push(identifier_char);
+
+            _next_pos = __next_pos;
+        }
+        let identifier = std::string::String::from_utf8(string_buffer).unwrap();
+
+        let (mem_loc, _next_pos) = read_u8(buffer, _next_pos);
+
+
+        identifier_list.push(Identifier{identifier, mem_loc});
+        next_pos = _next_pos;
+    }
+
+    (identifier_list, next_pos)
+}
+
+//Basic Function to read the Immediate values of the programm from the buffer
+fn read_immediates(buffer: &Vec<u8>, start_pos: usize, num: u32) -> (Vec<Immediate>, usize) {
+    let mut next_pos = start_pos;
+    let mut immediate_list: Vec<Immediate> = Vec::with_capacity(num as usize);
+
+    for _ in 0..num {
+        let (val, _next_pos) = read_f64(&buffer, next_pos);
+        let (mem_loc, _next_pos) = read_u8(&buffer, _next_pos);
+        immediate_list.push(Immediate {val, mem_loc});
+
+        next_pos = _next_pos;
+    }
+
+    (immediate_list ,next_pos)
+}
+
+fn read_instructions(buffer: &Vec<u8>, start_pos: usize, num: u32) -> (Vec<Instruction>, usize) {
+    let mut next_pos = start_pos;
+    let mut instructions: Vec<Instruction> = Vec::with_capacity(num as usize);
+
+    for _ in 0..num {
+        let (zero, _next_pos) = read_u8(&buffer, next_pos);
+        let (data2, _next_pos) = read_u8(&buffer, _next_pos);
+        let (data1, _next_pos) = read_u8(&buffer, _next_pos);
+        let (opcode, _next_pos) = read_u8(&buffer, _next_pos);
+        
+        if zero != 0 {
+            println!("Something is very about this file {}", zero);
+            //exit(1);
+        }
+
+        instructions.push(Instruction {opcode, data1, data2});
+        next_pos = _next_pos;
+    }
+    (instructions, next_pos)
 }
