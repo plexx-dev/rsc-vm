@@ -19,7 +19,7 @@ pub struct Immediate {
     pub mem_loc: u8
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Instruction {
     pub opcode: Opcode,
     pub data1: u8,
@@ -44,12 +44,6 @@ pub struct Data {
     pub immediates: Vec<Immediate>,
 
     pub instructions: Vec<Instruction>,
-}
-
-impl Data {
-    pub fn new(file_path: &Path) -> () {
-        read_file(file_path);
-    }
 }
 
 //Get the Data from the file and return it as a vec of bytes (u8)
