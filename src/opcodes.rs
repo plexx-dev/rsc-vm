@@ -1,5 +1,7 @@
 extern crate num_enum;
+extern crate libm;
 
+use libm::{tgamma, tgammaf};
 use num_enum::TryFromPrimitive;
 
 #[derive(Debug, TryFromPrimitive)]
@@ -31,4 +33,137 @@ pub enum Opcode {
     Jpz = 17, //jump if flag is not set
     Jmp = 18, //jump unconditionally
     Hlt = 19, //halt execution
+}
+
+pub fn opcode_handling(ram_buffer: &mut [f64; 255], opcode: &Opcode, data1: u8, data2: u8) -> () {
+    match opcode {
+        Opcode::Mov => handle_mov(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Add => handle_add(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Sub => handle_sub(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Mul => handle_mul(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Div => handle_div(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Mag => handle_mag(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Fac => handle_fac(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Pow => handle_pow(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Inc => handle_inc(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Dec => handle_dec(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Mas => handle_mas(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Das => handle_das(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Pas => handle_pas(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Clt => handle_clt(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Cgt => handle_cgt(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Ceq => handle_ceq(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Cne => handle_cne(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Jpz => handle_jpz(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Jmp => handle_jmp(ram_buffer, data1 as usize, data2 as usize),
+        Opcode::Hlt => handle_hlt(ram_buffer, data1 as usize, data2 as usize),
+    }
+}
+
+fn handle_mov(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data2] = ram_buffer[data1];
+}
+
+// Arithmetic Operators
+
+fn handle_add(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] += ram_buffer[data2];
+}
+
+fn handle_sub(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] -= ram_buffer[data2];
+}
+
+fn handle_mul(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] *= ram_buffer[data2];
+}
+
+fn handle_div(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] /= ram_buffer[data2];
+}
+
+fn handle_mag(ram_buffer: &mut [f64; 255], data1: usize, _data2: usize) {
+    ram_buffer[data1] = ram_buffer[data1].abs();
+}
+
+fn handle_fac(ram_buffer: &mut [f64; 255], data1: usize, _data2: usize) {
+    let val = ram_buffer[data1];
+
+    if val <= 0.0 || val == 1.0 {
+        ram_buffer[data1] = 1.0;
+    } else {
+        ram_buffer[data1] = tgamma(ram_buffer[data1]);
+    }
+}
+
+fn handle_pow(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] = ram_buffer[data1].powf(ram_buffer[data2]);
+}
+
+fn handle_inc(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] += ram_buffer[data2];
+}
+
+fn handle_dec(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] -= ram_buffer[data2];
+}
+
+fn handle_mas(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] *= ram_buffer[data2];
+}
+
+fn handle_das(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] /= ram_buffer[data2];
+}
+
+fn handle_pas(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    ram_buffer[data1] /= ram_buffer[data2];
+}
+
+// Comparison
+
+fn handle_clt(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    if ram_buffer[data1] < ram_buffer[data2] {
+        ram_buffer[0] = 1.0;
+    } else {
+        ram_buffer[0] = 0.0;
+    }
+}
+
+fn handle_cgt(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    if ram_buffer[data1] > ram_buffer[data2] {
+        ram_buffer[0] = 1.0;
+    } else {
+        ram_buffer[0] = 0.0;
+    }
+}
+
+fn handle_ceq(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    if ram_buffer[data1] == ram_buffer[data2] {
+        ram_buffer[0] = 1.0;
+    } else {
+        ram_buffer[0] = 0.0;
+    }
+}
+
+fn handle_cne(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    if ram_buffer[data1] != ram_buffer[data2] {
+        ram_buffer[0] = 1.0;
+    } else {
+        ram_buffer[0] = 0.0;
+    }
+}
+
+// Control Flow
+
+fn handle_jpz(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    todo!();
+}
+
+fn handle_jmp(ram_buffer: &mut [f64; 255], data1: usize, data2: usize) {
+    todo!();
+}
+
+fn handle_hlt(ram_buffer: &mut [f64; 255], _data1: usize, _data2: usize) {
+    todo!();
 }

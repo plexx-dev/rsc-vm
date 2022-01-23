@@ -9,25 +9,25 @@ use std::convert::TryFrom;
 
 #[derive(Debug)]
 pub struct Identifier {
-    identifier: String,
-    mem_loc: u8
+    pub identifier: String,
+    pub mem_loc: u8
 }
 
 #[derive(Debug)]
 pub struct Immediate {
-    val: f64,
-    mem_loc: u8
+    pub val: f64,
+    pub mem_loc: u8
 }
 
 #[derive(Debug)]
 pub struct Instruction {
-    opcode: Opcode,
-    data1: u8,
-    data2: u8,
+    pub opcode: Opcode,
+    pub data1: u8,
+    pub data2: u8,
 }
 
 #[derive(Debug)]
-struct Header {
+pub struct Header {
     magic_word: u32,
     version: u32,
     mem_len: u8,
@@ -35,15 +35,15 @@ struct Header {
 
 #[derive(Debug)]
 pub struct Data {
-    header: Header,
+    pub header: Header,
 
-    input_identifier: Vec<Identifier>,
+    pub input_identifier: Vec<Identifier>,
 
-    output_identifier: Vec<Identifier>,
+    pub output_identifier: Vec<Identifier>,
 
-    immediates: Vec<Immediate>,
+    pub immediates: Vec<Immediate>,
 
-    instructions: Vec<Instruction>,
+    pub instructions: Vec<Instruction>,
 }
 
 impl Data {
@@ -70,7 +70,7 @@ fn get_data(file_path: &Path) -> Vec<u8> {
 }
 
 const MAGIC_WORD: u32 = 0xF00D4;
-fn read_file(file_path: &Path) -> Data {
+pub fn read_file(file_path: &Path) -> Data {
     let rsbf_data = get_data(file_path);
     let next_pos = 0;
 
