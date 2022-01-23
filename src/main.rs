@@ -1,5 +1,5 @@
 use std::path::Path;
-use std::env;
+use std::time::Instant;
 
 mod vm;
 mod vm_data;
@@ -7,8 +7,10 @@ mod opcodes;
 
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    vm::run(Path::new("files/shit.rsbf"), vec![420.0, 69.0]);
+    let start = Instant::now();
+    vm::run(Path::new("files/abc.rsbf"), vec![420.0, 23.0]);
+    let duration = start.elapsed();
+    println!("{:?}", duration);
 }
 
 #[cfg(test)]

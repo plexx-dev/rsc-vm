@@ -45,7 +45,7 @@ pub fn opcode_handling(state: &mut VmState) -> () {
     let data1 = instruction.data1;
     let data2 = instruction.data2;
 
-    println!("{:?} ${} ${}", opcode, data1, data2);
+    //println!("{:?} ${} ${}", opcode, data1, data2);
 
     match opcode {
         Opcode::Mov => handle_mov(state, data1 as usize, data2 as usize),
@@ -100,7 +100,7 @@ fn handle_mag(state: &mut VmState, data1: usize, _data2: usize) {
 fn handle_fac(state: &mut VmState, data1: usize, _data2: usize) {
     let val = state.ram_buffer[data1];
 
-    if val <= 0.0 || val == 1.0 {
+    if val == 0.0 || val == 1.0 {
         state.ram_buffer[0] = 1.0;
     } else {
         state.ram_buffer[0] = tgamma(state.ram_buffer[data1] + 1.0);
@@ -160,7 +160,7 @@ fn handle_cne(state: &mut VmState, data1: usize, data2: usize) {
 // Control Flow
 
 fn handle_jpz(state: &mut VmState, _data1: usize, _data2: usize) {
-    if state.flag {
+    if !state.flag {
         state.pos = (_data1 - 1) as u32;
     }
 }
