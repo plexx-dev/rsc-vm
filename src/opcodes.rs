@@ -92,7 +92,7 @@ fn handle_fac(ram_buffer: &mut [f64; 255], data1: usize, _data2: usize) {
     if val <= 0.0 || val == 1.0 {
         ram_buffer[data1] = 1.0;
     } else {
-        ram_buffer[data1] = tgamma(ram_buffer[data1]);
+        ram_buffer[data1] = tgamma(ram_buffer[data1] + 1.0);
     }
 }
 
