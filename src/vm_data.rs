@@ -1,4 +1,7 @@
 use std::{fs::File, path::Path, process::exit, io::Read};
+use crate::opcodes::Opcode;
+
+use std::convert::TryFrom;
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
@@ -18,7 +21,7 @@ pub struct Immediate {
 
 #[derive(Debug)]
 pub struct Instruction {
-    opcode: u8,
+    opcode: Opcode,
     data1: u8,
     data2: u8,
 }
@@ -30,6 +33,7 @@ struct Header {
     mem_len: u8,
 }
 
+#[derive(Debug)]
 pub struct Data {
     header: Header,
 
@@ -72,7 +76,7 @@ fn read_file(file_path: &Path) -> Data {
 
     //Read the Header
     let (header, next_pos) = read_header(&rsbf_data, next_pos);
-    println!("Checking Magic Word");
+    println!("Checking Magic Word...");
 
     //Check Magic Word to check if the file could be a valid one
     if header.magic_word != MAGIC_WORD {
@@ -80,6 +84,13 @@ fn read_file(file_path: &Path) -> Data {
         exit(0x0100); // idk took some random code :) to exit here
     }
     println!("Magic Word was correct");
+
+    println!("Checking Version...");
+    if header.version != 4 {
+        println!("Go to https://github.com/plexx-dev/rsc-vm and add a new Version to this shit idk man it's just not supported yet :(");
+        exit(1);
+    }
+    println!("Version supported");
 
     println!("Version: {}\nMemory Size: {}bytes with {} Memory Addresses"
             , header.version, (header.mem_len as u64*4*8), header.mem_len);
@@ -187,6 +198,7 @@ fn read_immediates(buffer: &Vec<u8>, start_pos: usize, num: u32) -> (Vec<Immedia
     (immediate_list ,next_pos)
 }
 
+//Basic Function to read the Instructions from the buffer
 fn read_instructions(buffer: &Vec<u8>, start_pos: usize, num: u32) -> (Vec<Instruction>, usize) {
     let mut next_pos = start_pos;
     let mut instructions: Vec<Instruction> = Vec::with_capacity(num as usize);
@@ -195,11 +207,12 @@ fn read_instructions(buffer: &Vec<u8>, start_pos: usize, num: u32) -> (Vec<Instr
         let (zero, _next_pos) = read_u8(&buffer, next_pos);
         let (data2, _next_pos) = read_u8(&buffer, _next_pos);
         let (data1, _next_pos) = read_u8(&buffer, _next_pos);
-        let (opcode, _next_pos) = read_u8(&buffer, _next_pos);
+        let (opcode_code, _next_pos) = read_u8(&buffer, _next_pos);
+        let opcode: Opcode = Opcode::try_from(opcode_code).unwrap();
         
         if zero != 0 {
             println!("Something is very about this file {}", zero);
-            //exit(1);
+            exit(1);
         }
 
         instructions.push(Instruction {opcode, data1, data2});

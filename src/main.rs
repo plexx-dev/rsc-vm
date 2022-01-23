@@ -2,6 +2,7 @@ use std::path::Path;
 
 mod vm;
 mod vm_data;
+mod opcodes;
 
 fn main() {
     vm::run(Path::new("files/script.rsbf"));
