@@ -7,10 +7,9 @@ mod opcodes;
 
 
 fn main() {
-    let start = Instant::now();
+    
     vm::run(Path::new("files/abc.rsbf"), vec![420.0, 23.0]);
-    let duration = start.elapsed();
-    println!("{:?}", duration);
+    
 }
 
 #[cfg(test)]

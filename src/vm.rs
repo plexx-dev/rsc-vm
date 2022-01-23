@@ -1,4 +1,5 @@
 use std::process::exit;
+use std::time::Instant;
 use std::{path::Path};
 
 use crate::vm_data::{read_file, Data, Instruction, Immediate, Identifier};
@@ -28,8 +29,13 @@ pub fn run(file_path: &Path, args: Vec<f64>) {
         args,
     };
 
+    let start = Instant::now();
+
     init(&vm_data, &mut state);
     execute(&mut state);
+
+    let duration = start.elapsed();
+    println!("{:?}", duration);
 
     //println!("{:?}", state);
 
