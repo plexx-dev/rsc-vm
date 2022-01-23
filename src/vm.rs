@@ -1,3 +1,4 @@
+use std::process::exit;
 use std::{path::Path};
 
 use crate::vm_data::{read_file, Data, Instruction, Immediate, Identifier};
@@ -11,16 +12,17 @@ pub struct VmState {
 
     pub pos: u32,
 
-    pub instructions: Vec<Instruction>
+    pub instructions: Vec<Instruction>,
+    pub args: Vec<f64>,
 }
 
-pub fn run(file_path: &Path) {
+pub fn run(file_path: &Path, args: Vec<f64>) {
     let vm_data: Data = read_file(file_path);
 
     let ram_buffer: [f64; 255] = [0.0; 255];
-    let mut state = VmState {ram_buffer, flag: false, hlt_flag: false, instructions: vm_data.instructions, pos: 0};
+    let mut state = VmState {ram_buffer, flag: false, hlt_flag: false, instructions: vm_data.instructions.clone(), pos: 0, args};
 
-    init(&vm_data.immediates, &mut state);
+    init(&vm_data, &mut state);
     execute(&mut state);
 
     //println!("{:?}", state);
@@ -28,16 +30,24 @@ pub fn run(file_path: &Path) {
     get_output(vm_data.output_identifier, &state);
 }
 
-//Prepare the ram buffer for the main execution loop
-fn init(immediates: &Vec<Immediate>, state: &mut VmState) {
+//Prepare the vm for the main execution loop
+fn init(vm_data: &Data, state: &mut VmState) {
     //Load the Immediates
-    for i in 0..immediates.len() {
-        state.ram_buffer[immediates[i].mem_loc as usize] = immediates[i].val;
+    for i in 0..vm_data.immediates.len() {
+        state.ram_buffer[vm_data.immediates[i].mem_loc as usize] = vm_data.immediates[i].val;
+    }
+
+    if state.args.len() < vm_data.input_identifier.len() || state.args.len() > vm_data.input_identifier.len() {
+        println!("Input values do not match the ones from the script. Please check your input variables!");
+        exit(1);
+    }
+
+    for i in 0..state.args.len() {
+        state.ram_buffer[vm_data.input_identifier[i].mem_loc as usize] = state.args[i];
     }
 }
 
 fn execute(state: &mut VmState) {
-
     loop {
         if state.hlt_flag {
             break;
@@ -54,5 +64,5 @@ fn get_output(output_identifier: Vec<Identifier>, state: &VmState) {
         println!("{} = {}", n.identifier, state.ram_buffer[n.mem_loc as usize]);
     }
 
-    println!("[DEBUG]\n{:?}", state.ram_buffer);
+    //println!("[DEBUG]\n{:?}", state.ram_buffer);
 }

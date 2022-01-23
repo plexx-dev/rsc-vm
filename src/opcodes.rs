@@ -78,7 +78,6 @@ fn handle_mov(state: &mut VmState, data1: usize, data2: usize) {
 // Arithmetic Operators
 
 fn handle_add(state: &mut VmState, data1: usize, data2: usize) {
-    println!("Add {} + {} = {}", state.ram_buffer[data1], state.ram_buffer[data2], state.ram_buffer[0]);
     state.ram_buffer[0] = state.ram_buffer[data1] + state.ram_buffer[data2];
 }
 
@@ -162,12 +161,12 @@ fn handle_cne(state: &mut VmState, data1: usize, data2: usize) {
 
 fn handle_jpz(state: &mut VmState, _data1: usize, _data2: usize) {
     if state.flag {
-        state.pos = _data1 as u32;
+        state.pos = (_data1 - 1) as u32;
     }
 }
 
 fn handle_jmp(state: &mut VmState, _data1: usize, _data2: usize) {
-    state.pos = _data1 as u32;
+    state.pos = (_data1 - 1) as u32;
 }
 
 fn handle_hlt(state: &mut VmState, _data1: usize, _data2: usize) {

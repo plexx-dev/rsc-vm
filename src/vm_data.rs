@@ -104,8 +104,6 @@ pub fn read_file(file_path: &Path) -> Data {
     let (num_instruction, next_pos) = read_u32(&rsbf_data, next_pos);
     let (instructions, _next_pos) = read_instructions(&rsbf_data, next_pos, num_instruction);
 
-    println!("\n{:?}\n{:?}\n{:?}\n{:?}", input_identifier, output_identifier, immediates, instructions);
-
     Data {header, input_identifier, output_identifier, immediates, instructions}
 }
 
