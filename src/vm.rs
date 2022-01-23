@@ -20,7 +20,13 @@ pub fn run(file_path: &Path, args: Vec<f64>) {
     let vm_data: Data = read_file(file_path);
 
     let ram_buffer: [f64; 255] = [0.0; 255];
-    let mut state = VmState {ram_buffer, flag: false, hlt_flag: false, instructions: vm_data.instructions.clone(), pos: 0, args};
+    let mut state = VmState {ram_buffer,
+        flag: false, 
+        hlt_flag: false, 
+        instructions: vm_data.instructions.clone(), 
+        pos: 0, 
+        args,
+    };
 
     init(&vm_data, &mut state);
     execute(&mut state);
@@ -37,7 +43,7 @@ fn init(vm_data: &Data, state: &mut VmState) {
         state.ram_buffer[vm_data.immediates[i].mem_loc as usize] = vm_data.immediates[i].val;
     }
 
-    if state.args.len() < vm_data.input_identifier.len() || state.args.len() > vm_data.input_identifier.len() {
+    if state.args.len() != vm_data.input_identifier.len() {
         println!("Input values do not match the ones from the script. Please check your input variables!");
         exit(1);
     }
