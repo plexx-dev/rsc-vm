@@ -4,7 +4,7 @@ extern crate float_eq;
 
 use libm::{tgamma};
 use num_enum::TryFromPrimitive;
-use float_eq::{assert_float_eq, float_eq, float_ne};
+use float_eq::{float_eq, float_ne};
 
 use crate::vm::VmState;
 
