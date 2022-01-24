@@ -1,3 +1,4 @@
+use core::num;
 use std::path::Path;
 
 mod vm;
@@ -6,9 +7,15 @@ mod opcodes;
 
 
 fn main() {
+    let given_args: Vec<String> = std::env::args().collect();
+    let mut used_args = Vec::<f64>::with_capacity(given_args.len()-1);
+
+    for i in 1..given_args.len() {
+        let char : f64 = given_args[i].trim().parse().unwrap();
+        used_args.push(char);
+    }
     
-    vm::run(Path::new("files/yo.rsbf"), vec![420.0, 23.0, 23.0]);
-    
+    vm::run(Path::new("files/abc.rsbf"), used_args);
 }
 
 #[cfg(test)]
