@@ -32,6 +32,13 @@ pub fn run(file_path: &Path, args: Vec<f64>) {
     let start = Instant::now();
 
     init(&vm_data, &mut state);
+
+    /*let mut i = 0;
+    for n in &state.instructions {
+        println!("[{}] {:?} ${} ${}", i, n.opcode, n.data1, n.data2);
+        i+=1;
+    }*/
+
     execute(&mut state);
 
     let duration = start.elapsed();

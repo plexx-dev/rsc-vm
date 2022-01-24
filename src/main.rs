@@ -7,7 +7,7 @@ mod opcodes;
 
 fn main() {
     
-    vm::run(Path::new("files/abc.rsbf"), vec![420.0, 23.0]);
+    vm::run(Path::new("files/yo.rsbf"), vec![420.0, 23.0, 23.0]);
     
 }
 

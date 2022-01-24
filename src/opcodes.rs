@@ -1,8 +1,10 @@
 extern crate num_enum;
 extern crate libm;
+extern crate float_eq;
 
 use libm::{tgamma};
 use num_enum::TryFromPrimitive;
+use float_eq::{assert_float_eq, float_eq, float_ne};
 
 use crate::vm::VmState;
 
@@ -46,7 +48,7 @@ pub fn opcode_handling(state: &mut VmState) -> () {
     let data2 = instruction.data2;
 
     //this 100x the execution time lol
-    //println!("{:?} ${} ${}", opcode, data1, data2);
+    //println!("[{}] {:?} ${} ${} | Flag: {}", state.pos, opcode, data1, data2, state.flag);
 
     match opcode {
         Opcode::Mov => handle_mov(state, data1 as usize, data2 as usize),
@@ -147,13 +149,13 @@ fn handle_cgt(state: &mut VmState, data1: usize, data2: usize) {
 }
 
 fn handle_ceq(state: &mut VmState, data1: usize, data2: usize) {
-    if state.ram_buffer[data1] == state.ram_buffer[data2] {
+    if float_eq!(state.ram_buffer[data1], state.ram_buffer[data2], ulps <= 10) {
         state.flag = true;
     }
 }
 
 fn handle_cne(state: &mut VmState, data1: usize, data2: usize) {
-    if state.ram_buffer[data1] != state.ram_buffer[data2] {
+    if float_ne!(state.ram_buffer[data1], state.ram_buffer[data2], ulps <= 10) {
         state.flag = true;
     }
 }
@@ -163,6 +165,10 @@ fn handle_cne(state: &mut VmState, data1: usize, data2: usize) {
 fn handle_jpz(state: &mut VmState, _data1: usize, _data2: usize) {
     if !state.flag {
         state.pos = (_data1 - 1) as u32;
+    }
+
+    if state.flag {
+        state.flag = false;
     }
 }
 
