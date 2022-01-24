@@ -41,9 +41,10 @@ cargo run --release 2 3
 
 # Important
 
-If you think you can expect any masterpiece or in general in any way a decently optimized Code here you're wrong. This is just to brag about my friend [Weckyy702's](https://github.com/weckyy702) that Rust is or can be faster than C++.
+If you think you can expect any masterpiece or in general in any way a decently optimized Code here, you're wrong. This is just to brag about my friend [Weckyy702](https://github.com/weckyy702) that Rust is or can be faster than C++.
 
-Somehow this is faster by a order of magnitude than the original Version of the RaychelScript VM which it's original author [Weckyy702's](https://github.com/weckyy702) wrote in C++.
 Even though iam completly new to Rust and barley take advantage of Rust's full potential.
+This is faster by a order of magnitude than the original Version of the RaychelScript VM, which it's original author [Weckyy702](https://github.com/weckyy702) has written in C++.
+
 
 So i guess we all can assume Rust > C++.
