@@ -2,7 +2,7 @@ name: test
 on: [push]
 
 jobs:
-  publish-docker-image:
+  Unit testing:
     runs-on: ubuntu-latest
 
     steps:
