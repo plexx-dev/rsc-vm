@@ -12,9 +12,9 @@ This version currently only supports Version 4 of RaychelScript.
 
 ###
 
-- Any Error Handling inside the execution Loop (to be implemented)
-- Any Advanced File Reading Error Handling (to be implemented)
-- In General any Real Error Handling when sth stupid happens inside the VM (to be implemented)
+- Any Error Handling inside the execution Loop (to be implemented) 🛠
+- Any Advanced File Reading Error Handling (to be implemented) 🛠
+- In General any Real Error Handling when sth stupid happens inside the VM (to be implemented) 🛠
 
 # Usage
 
