@@ -70,24 +70,24 @@ pub fn read_file(file_path: &Path) -> Data {
 
     //Read the Header
     let (header, next_pos) = read_header(&rsbf_data, next_pos);
-    //println!("Checking Magic Word...");
+    println!("Checking Magic Word...");
 
     //Check Magic Word to check if the file could be a valid one
     if header.magic_word != MAGIC_WORD {
         println!("[ERROR] Magic Word did not match");
         exit(0x0100); // idk took some random code :) to exit here
     }
-    //println!("Magic Word was correct");
+    println!("Magic Word was correct");
 
-    //println!("Checking Version...");
+    println!("Checking Version...");
     if header.version != 4 {
         println!("Go to https://github.com/plexx-dev/rsc-vm and add a new Version to this shit idk man it's just not supported yet :(");
         exit(1);
     }
-    //println!("Version supported");
+    println!("Version supported");
 
-    //println!("Version: {}\nMemory Size: {}bytes with {} Memory Addresses"
-    //        , header.version, (header.mem_len as u64*4*8), header.mem_len);
+    println!("Version: {}\nMemory Size: {}bytes with {} Memory Addresses"
+            , header.version, (header.mem_len as u64*4*8), header.mem_len);
 
     //Read the I/O Section
     let (num_input_identifier, next_pos) = read_u32(&rsbf_data, next_pos);

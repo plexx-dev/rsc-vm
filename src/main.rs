@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::time::Instant;
 
 mod vm;
 mod vm_data;

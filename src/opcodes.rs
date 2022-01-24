@@ -45,6 +45,7 @@ pub fn opcode_handling(state: &mut VmState) -> () {
     let data1 = instruction.data1;
     let data2 = instruction.data2;
 
+    //this 100x the execution time lol
     //println!("{:?} ${} ${}", opcode, data1, data2);
 
     match opcode {

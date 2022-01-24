@@ -2,7 +2,7 @@ use std::process::exit;
 use std::time::Instant;
 use std::{path::Path};
 
-use crate::vm_data::{read_file, Data, Instruction, Immediate, Identifier};
+use crate::vm_data::{read_file, Data, Instruction, Identifier};
 use crate::opcodes::opcode_handling;
 
 #[derive(Debug, Clone)]
@@ -36,8 +36,6 @@ pub fn run(file_path: &Path, args: Vec<f64>) {
 
     let duration = start.elapsed();
     println!("{:?}", duration);
-
-    //println!("{:?}", state);
 
     get_output(vm_data.output_identifier, &state);
 }
