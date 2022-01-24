@@ -11,8 +11,13 @@ fn main() {
     let mut used_args = Vec::<f64>::with_capacity(given_args.len()-1);
 
     for i in 1..given_args.len() {
-        let char : f64 = given_args[i].trim().parse().unwrap();
-        used_args.push(char);
+        match given_args[i].trim().parse::<f64>() {
+            Ok(arg) => used_args.push(arg),
+            Err(_) => {
+                println!("Your Arguments were not correct");
+                std::process::exit(1);
+            },
+        }
     }
     
     vm::run(Path::new("files/abc.rsbf"), used_args);
@@ -24,7 +29,12 @@ mod tests {
     use crate::vm;
 
     #[test]
-    fn test() {
-        vm::run(Path::new("files/script.rsbf"), vec![10.0, 5.0]);
+    fn test1() {
+        vm::run(Path::new("files/abc.rsbf"), vec![10.0, 5.0]);
+    }
+
+    #[test]
+    fn test2() {
+        vm::run(Path::new("files/yo.rsbf"), vec![10.0, 5.0, 69.0]);
     }
 }
